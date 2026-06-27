@@ -1,0 +1,405 @@
+{
+  "name": "Personal Automation Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        -240
+      ],
+      "id": "5b8afc5c-abde-4d67-82d0-fd5fa55c2f12",
+      "name": "Telegram Trigger",
+      "webhookId": "a10e9d65-58d9-4ac1-ba1b-dcc2fe2e335f",
+      "credentials": {
+        "telegramApi": {
+          "id": "66I8jOgD08nYCwVQ",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are Khoshaba's personal automation assistant. You have access to three tools: personal expenses (category, amount, date), job applications (company, role, status, applied date), and sales leads (name, company, score, qualified, reason). Use the relevant tool whenever asked about finances, job search, or leads — never guess, always look up real data. None of the tools take parameters — call them with no input and do any filtering or math yourself. Remember context from earlier in the conversation."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        144,
+        -240
+      ],
+      "id": "75063640-f571-4fb8-810a-ad8d799fc383",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id}}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        96,
+        -64
+      ],
+      "id": "d292d2d7-5e13-4f50-8496-d2bad5df06ae",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        -240
+      ],
+      "id": "0f0c9108-8b4f-479f-b5e2-0312527e203f",
+      "name": "Send a text message",
+      "webhookId": "9373dd81-8a77-40f0-8bcb-253fd3018746",
+      "credentials": {
+        "telegramApi": {
+          "id": "66I8jOgD08nYCwVQ",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Looks up all of the user's logged job applications (company, role, applied date, status, contact email). This tool takes no input parameters — always returns every row. After calling it, filter or summarize the results yourself based on what the user actually asked.",
+        "documentId": {
+          "__rl": true,
+          "value": "1N-qh0VwGsxDrR6R-fheg-n-n9xNGcIg0Jz0Sx9Y66VU",
+          "mode": "list",
+          "cachedResultName": "Job Applications",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1N-qh0VwGsxDrR6R-fheg-n-n9xNGcIg0Jz0Sx9Y66VU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1N-qh0VwGsxDrR6R-fheg-n-n9xNGcIg0Jz0Sx9Y66VU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        400,
+        -64
+      ],
+      "id": "62adee78-a4f7-4e28-a4d1-da5fdff64016",
+      "name": "Job Application",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aa7platy65DSRUoD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Looks up all of the user's logged personal expenses (category, amount, date). This tool takes no input parameters — always returns every row. After calling it, filter or total the results yourself based on what the user actually asked.",
+        "documentId": {
+          "__rl": true,
+          "value": "1G92pnO9ROehDnLxEIAocjVPetN403t4X3K0LXQY33dY",
+          "mode": "list",
+          "cachedResultName": "Finance Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G92pnO9ROehDnLxEIAocjVPetN403t4X3K0LXQY33dY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "expenses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G92pnO9ROehDnLxEIAocjVPetN403t4X3K0LXQY33dY/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        304,
+        -64
+      ],
+      "id": "f9c97b1c-c74a-4d1d-9d9e-7eeaaaf3c940",
+      "name": "Expenses",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aa7platy65DSRUoD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Looks up all logged sales leads, including name, company, need, score, qualified status, and reason. This tool takes no input parameters — always returns every record. Filter or summarize the results yourself based on what the user asked. Use this when the user asks about leads, prospects, or sales pipeline.",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appUmhXpBoC6PrSI3",
+          "mode": "list",
+          "cachedResultName": "Lead Qualification CRM",
+          "cachedResultUrl": "https://airtable.com/appUmhXpBoC6PrSI3"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblx9QC0mBFjnZL51",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://airtable.com/appUmhXpBoC6PrSI3/tblx9QC0mBFjnZL51"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        -80
+      ],
+      "id": "1574ece9-0909-448b-8624-c6f2832595e7",
+      "name": "Search records in Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "FO88JOrqjVAHLcxt",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Logs a new personal expense. Call this when the user explicitly asks to log, add, or record a new expense. Always capitalize the category's first letter (e.g. \"Taxi\", not \"taxi\"). Requires a category and an amount — ask if either is missing rather than guessing.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1G92pnO9ROehDnLxEIAocjVPetN403t4X3K0LXQY33dY",
+          "mode": "list",
+          "cachedResultName": "Finance Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G92pnO9ROehDnLxEIAocjVPetN403t4X3K0LXQY33dY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "expenses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G92pnO9ROehDnLxEIAocjVPetN403t4X3K0LXQY33dY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Category', ``, 'string') }}",
+            "Amount": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Amount', ``, 'string') }}",
+            "ChatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "Date": "={{ new Date().toLocaleDateString('en-GB') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ChatId",
+              "displayName": "ChatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        640,
+        -96
+      ],
+      "id": "a850c68e-8c7d-4b25-88ce-2f4683a96184",
+      "name": "append message",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aa7platy65DSRUoD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -64
+      ],
+      "id": "c97cfd75-9c2b-44ae-979f-0632fc85ebee",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "MMnak1g3NDKX7aH5",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Application": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expenses": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records in Airtable": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "append message": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "fdedbc0f-ed01-47cc-a673-cc753770a55a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4882ae57fae7f5198ca4a60b64d52e13372c8da31b44d4c64833b5b89f9efda5"
+  },
+  "nodeGroups": [],
+  "id": "w8CcnwNcXYzdYX72",
+  "tags": [
+    {
+      "updatedAt": "2026-06-24T09:01:36.583Z",
+      "createdAt": "2026-06-24T09:01:36.583Z",
+      "id": "iqfTAcaqWZv4qG4d",
+      "name": "By Khoshaba Assyrian"
+    }
+  ]
+}
