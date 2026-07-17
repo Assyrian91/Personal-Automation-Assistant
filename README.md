@@ -1,5 +1,10 @@
 # Personal Automation Assistant (AI Agent)
 
+![n8n](https://img.shields.io/badge/n8n-Workflow_Automation-EA4B71?style=for-the-badge&logo=n8n&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-llama--3.3--70b-F55036?style=for-the-badge&logo=groq&logoColor=white)
+![Telegram](https://img.shields.io/badge/Telegram-Bot_API-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)
+![Airtable](https://img.shields.io/badge/Airtable-Tool_Integration-18BFFF?style=for-the-badge&logo=airtable&logoColor=white)
+
 A conversational AI agent — not a fixed pipeline — that connects to multiple personal data sources and decides on its own which one to use based on what's actually asked, with working memory across messages and the ability to both read and write data.
 
 ## Problem it solves
@@ -55,10 +60,6 @@ You'll need:
 - **Rate limiting on the free model tier:** rapid testing hit Gemini's free-tier request limit. Solved by swapping the Chat Model sub-node to Groq — a clean swap since memory, tools, and the agent's own configuration are all attached to the Agent node, not the model.
 - **Tool call schema mismatch:** a faster model invented filter parameters (`filter_key`, `filter_value`) that the underlying Sheets tool was never built to accept, since nothing told it the tool took no input. Fixed by being explicit in the tool description that the tool accepts no parameters and that filtering should happen in the model's own reasoning, not as a tool argument.
 
-## Demo
-
-🎥 [Loom walkthrough — add link here]
-
 ## Possible next steps
 
 - A proactive daily digest (Schedule Trigger + all data sources + conditional alerting, silent on quiet days)
@@ -68,3 +69,7 @@ You'll need:
 ## Running cost
 
 Telegram Bot API, Google Sheets API, Airtable API: free. Groq (llama-3.3-70b-versatile): free tier, rate-limited rather than metered. n8n: free if self-hosted, or from $24/month on n8n Cloud after the trial period.
+
+## Author
+
+**Khoshaba Odeesho** — [github.com/Assyrian91](https://github.com/Assyrian91)
